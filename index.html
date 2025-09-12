@@ -15,8 +15,10 @@
           <p>Choose a version to play:</p>
           <button id="playOgSlope">Play OG Slope</button>
           <button id="playWebSlope">Play Web Slope</button>
+          <button id="playShredmill">Play Shredmill</button>
           <br><br>
           <iframe id="gameFrame" width="800" height="600" style="display:none;" frameborder="0" scrolling="no" allowfullscreen></iframe>
+          <iframe id="shredmillFrame" width="800" height="600" style="display:none;" frameborder="0" scrolling="no" allowfullscreen src=""></iframe>
           <br>
           <button id="fullscreenBtn" style="display:none;">Go Fullscreen</button>
           <p id="bottomText">Welcome to Slope Unblocked! Enjoy.</p>
@@ -26,26 +28,67 @@
     <script>
       var ogBtn = document.getElementById('playOgSlope');
       var webBtn = document.getElementById('playWebSlope');
+      var shredmillBtn = document.getElementById('playShredmill');
       var iframe = document.getElementById('gameFrame');
+      var shredmillFrame = document.getElementById('shredmillFrame');
       var fullscreenBtn = document.getElementById('fullscreenBtn');
+      var currentFrame = null;
       ogBtn.onclick = function() {
         window.open('ogslope.html', '_blank');
       };
       webBtn.onclick = function() {
+        shredmillFrame.style.display = "none";
         iframe.removeAttribute('srcdoc');
         iframe.src = "https://azgames.io/game/slope/";
         iframe.style.display = "block";
         fullscreenBtn.style.display = "inline-block";
+        currentFrame = iframe;
+      };
+      shredmillBtn.onclick = function() {
+        iframe.style.display = "none";
+        shredmillFrame.src = "shredmillsrc/index.html";
+        shredmillFrame.style.display = "block";
+        fullscreenBtn.style.display = "inline-block";
+        currentFrame = shredmillFrame;
+        // Patch: Inject asset path fixer into Shredmill iframe after load
+        shredmillFrame.onload = function() {
+          try {
+            const script = shredmillFrame.contentDocument.createElement('script');
+            script.textContent = `
+              (function() {
+                const origCreateElement = document.createElement;
+                document.createElement = function(tag) {
+                  const el = origCreateElement.call(document, tag);
+                  if (tag === 'audio' || tag === 'img' || tag === 'script') {
+                    const origSetAttribute = el.setAttribute;
+                    el.setAttribute = function(name, value) {
+                      if ((name === 'src' || name === 'href') && typeof value === 'string' && value.includes('html5game/')) {
+                        value = value.replace('html5game/', '');
+                      }
+                      origSetAttribute.call(this, name, value);
+                    };
+                  }
+                  return el;
+                };
+              })();
+            `;
+            shredmillFrame.contentDocument.head.appendChild(script);
+          } catch (e) {
+            // Ignore if cross-origin
+          }
+        };
       };
       fullscreenBtn.onclick = function() {
-        if (iframe.requestFullscreen) {
-          iframe.requestFullscreen();
-        } else if (iframe.mozRequestFullScreen) {
-          iframe.mozRequestFullScreen();
-        } else if (iframe.webkitRequestFullscreen) {
-          iframe.webkitRequestFullscreen();
-        } else if (iframe.msRequestFullscreen) {
-          iframe.msRequestFullscreen();
+        if (currentFrame) {
+          if (currentFrame.requestFullscreen) {
+            currentFrame.requestFullscreen();
+          } else if (currentFrame.mozRequestFullScreen) {
+            currentFrame.mozRequestFullScreen();
+          } else if (currentFrame.webkitRequestFullscreen) {
+            currentFrame.webkitRequestFullscreen();
+          } else if (currentFrame.msRequestFullscreen) {
+            currentFrame.msRequestFullscreen();
+          }
         }
       };
     </script>
