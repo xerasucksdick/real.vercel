@@ -40,7 +40,7 @@
 </head>
 <body>
     <div id="doom-container">
-        <h2 style="color:white;text-align:center;">SkullKidFlash</h2>
+        <h2 style="color:white;text-align:center;">Smileys war</h2>
         <div id="ruffle-player"></div>
         <button id="fullscreen-btn">Go Fullscreen</button>
     </div>
@@ -51,7 +51,7 @@
             const ruffle = window.RufflePlayer.newest();
             player = ruffle.createPlayer();
             document.getElementById("ruffle-player").appendChild(player);
-            player.load("63747_skullkid.swf");
+            player.load("smileys-war-617.swf");
 
             document.getElementById('fullscreen-btn').onclick = function() {
                 if (player.requestFullscreen) {
