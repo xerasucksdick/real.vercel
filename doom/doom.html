@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png" />
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+       <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
         body {
             background: #111;
@@ -22,20 +22,48 @@
             padding: 16px;
             border-radius: 8px;
         }
+        button {
+            margin: 16px auto 0 auto;
+            display: block;
+            padding: 0.5em 2em;
+            font-size: 1.1em;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body>
     <div id="doom-container">
         <h2 style="color:white;text-align:center;">DOOM Flash</h2>
         <div id="ruffle-player"></div>
+        <button id="fullscreen-btn">Go Fullscreen</button>
     </div>
     <script>
+        let player;
         window.RufflePlayer = window.RufflePlayer || {};
         window.addEventListener("DOMContentLoaded", () => {
             const ruffle = window.RufflePlayer.newest();
-            const player = ruffle.createPlayer();
+            player = ruffle.createPlayer();
             document.getElementById("ruffle-player").appendChild(player);
-            player.load("doom-1.swf");
+            player.load("doom.swf");
+
+            document.getElementById('fullscreen-btn').onclick = function() {
+                if (player.requestFullscreen) {
+                    player.requestFullscreen();
+                } else if (player.webkitRequestFullscreen) {
+                    player.webkitRequestFullscreen();
+                } else if (player.mozRequestFullScreen) {
+                    player.mozRequestFullScreen();
+                } else if (player.msRequestFullscreen) {
+                    player.msRequestFullscreen();
+                }
+            };
         });
     </script>
 </body>
