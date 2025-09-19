@@ -1,1 +1,54 @@
-
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Standalone Android Emulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/novnc@1.3.0/app/ui.js"></script>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      #android-vnc { width: 100vw; height: 90vh; border: none; }
+      #controls { margin: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>Android Emulator (REAL)</h1>
+    <div id="controls">
+      <button onclick="startAndroid()">Start</button>
+      <button onclick="stopAndroid()">Stop</button>
+      <input type="file" id="apkfile"/>
+      <button onclick="uploadApk()">Upload APK</button>
+      <input type="text" id="adbcmd" placeholder="adb shell input keyevent 26"/>
+      <button onclick="runAdb()">Run ADB</button>
+      <span id="status"></span>
+    </div>
+    <iframe id="android-vnc" src="http://localhost:6080/vnc.html?host=localhost&port=6080"></iframe>
+    <script>
+      async function startAndroid() {
+        await fetch('http://localhost:8080/api/start', {method:"POST"});
+        document.getElementById('status').textContent = "VM starting...";
+      }
+      async function stopAndroid() {
+        await fetch('http://localhost:8080/api/stop', {method:"POST"});
+        document.getElementById('status').textContent = "VM stopped.";
+      }
+      async function uploadApk() {
+        const file = document.getElementById('apkfile').files[0];
+        if (!file) return alert('Select an APK file first!');
+        const formData = new FormData();
+        formData.append('apk', file);
+        const res = await fetch('http://localhost:8080/api/apk', {method:"POST", body: formData});
+        const data = await res.json();
+        alert('Install result: ' + JSON.stringify(data));
+      }
+      async function runAdb() {
+        const cmd = document.getElementById('adbcmd').value;
+        const res = await fetch('http://localhost:8080/api/adb', {
+          method:"POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({command: cmd})
+        });
+        const data = await res.json();
+        alert('ADB Output: ' + JSON.stringify(data));
+      }
+    </script>
+  </body>
+</html>
