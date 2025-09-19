@@ -1,0 +1,8 @@
+# Ignore large files and images
+backend/android-x86.qcow2
+backend/android-x86*.iso
+*.img
+*.qcow2
+*.vmdk
+*.apk
+*.bak
